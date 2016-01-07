@@ -37,18 +37,21 @@
             position: relative;
             border: 1px solid #aaa;
             line-height: 120%;
+            margin-bottom: 20px;
         }
 
         .data-grid table {
             border-spacing: 0;
             border-collapse: separate;
-            height: 100%;
             width: 100%;
-            margin-bottom: 20px;
         }
 
         .data-grid.inline .corner {
             display: none;
+        }
+
+        .compressed {
+            color: #c00;
         }
 
         .platform-mac .data-grid .corner,
@@ -196,6 +199,7 @@
         <option value="local">Local Storage</option>
         <option value="session">Session Storage</option>
     </select>
+    <span>Compressed files shown in <span class="compressed">red</span>.</span>
     <div id="sizeInfo">
         Compressed Size: <span id="compressedSize"></span>
         Uncompressed Size: <span id="uncompressedSize"></span>

@@ -85,12 +85,18 @@ function on(elSelector, eventName, selector, fn) {
 
             for (var key in message.data) {
                 if (message.data.hasOwnProperty(key)) {
-                    var value = message.data[key].charCodeAt(0) > 255 ? LZString.decompressFromUTF16(message.data[key]) : message.data[key];
+                    var value = message.data[key];
+                    var compressed = false;
+                    if (value.charCodeAt(0) > 255) {
+                        value = LZString.decompressFromUTF16(message.data[key]);
+                        compressed = true;
+                    }
+
                     compressedSize += message.data[key].length;
                     uncompressedSize += value.length;
                     html += '<tr>' +
                                 '<td class="key-column">' + key + '</td>' +
-                                '<td class="value-column" data-key="' + key + '">' +
+                                '<td class="value-column' + (compressed ? ' compressed' : '') + '" data-key="' + key + '">' +
                                     value +
                                 '</td>' +
                                 '<td class="corner"></td>' +
@@ -100,8 +106,8 @@ function on(elSelector, eventName, selector, fn) {
 
             document.querySelector('#tableBody').innerHTML = html;
             document.querySelector('#sizeInfo').style.display = 'inline-block';
-            document.querySelector('#compressedSize').innerText = humanFileSize(compressedSize);
-            document.querySelector('#uncompressedSize').innerText = humanFileSize(uncompressedSize);
+            document.querySelector('#compressedSize').innerText = humanFileSize(compressedSize * 2);    // Times 2 since we are using UFT-16 to store in localStorage
+            document.querySelector('#uncompressedSize').innerText = humanFileSize(uncompressedSize * 2);
         }
 
     });
@@ -116,7 +122,11 @@ on('#tableBody', 'click', 'tr', function(event) {
     for (var i = 0; i < nodeList.length; i++) {
         nodeList[i].classList.remove('selected');
     }
-    event.target.classList.add('selected');
+    var node = event.target;
+    while (node.nodeName != 'TR' && node.parentNode) {
+        node = node.parentNode;
+    }
+    node.classList.add('selected');
 });
 
 on('#tableBody', 'dblclick', 'tr', function(event) {

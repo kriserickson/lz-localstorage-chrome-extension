@@ -8,9 +8,9 @@
 
 chrome.extension.onConnect.addListener(function (port) {
 
-    var extensionListener = function (message, sender, sendResponse) {
+    var _loadedTabId;
 
-        var _loadedTabId;
+    var extensionListener = function (message, sender, sendResponse) {
 
         function getStorage(tabId, type) {
             chrome.tabs.executeScript(tabId, {code: 'lzLocalStorageGetLocalStorage.getStorage("' + type + '");'})
