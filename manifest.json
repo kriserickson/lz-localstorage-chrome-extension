@@ -1,0 +1,17 @@
+{
+  "name": "LZipped Local Storage",
+  "version": "0.0.3",
+  "manifest_version": 2,
+  "description": "LZipped Local Storage",
+  "devtools_page": "devtools.html",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "https://*/*"
+  ]
+}
