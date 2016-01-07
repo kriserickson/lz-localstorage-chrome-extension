@@ -182,12 +182,24 @@
             background: #00d9ff;
         }
 
+        #sizeInfo {
+            display: none;
+            float: right;
+        }
+
     </style>
 </head>
 <body>
 <div id="localStorage">
-    <h2>Local Storage</h2>
-    <button id="reload">Reload</button>
+    <h2 id="storageName">Local Storage</h2>
+    <select id="storageType">
+        <option value="local">Local Storage</option>
+        <option value="session">Session Storage</option>
+    </select>
+    <div id="sizeInfo">
+        Compressed Size: <span id="compressedSize"></span>
+        Uncompressed Size: <span id="uncompressedSize"></span>
+    </div>
 </div>
 <div class="data-grid">
     <table class="data">
@@ -207,7 +219,7 @@
 <div id="openModal" class="modalDialog">
     <div>	<a id="close" title="Close" class="close">X</a>
 
-        <h2>Local Storage Value</h2>
+        <h2 id="modalKeyValue"></h2>
 
         <pre id="jsonDetails"></pre>
     </div>

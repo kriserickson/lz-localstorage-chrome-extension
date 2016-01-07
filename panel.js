@@ -1,41 +1,16 @@
-bglog('background log');
-
-(function createChannel() {
-    //Create a port with background page for continous message communication
-    var port = chrome.extension.connect({
-        name: "Sample Communication" //Given a Name
-    });
-
-    // Listen to messages from the background page
-    port.onMessage.addListener(function (message) {
-        bglog('Got message...');
-
-        if (message.action == 'localStorage') {
-            var html = '';
-
-            for (var key in message.data) {
-                if (message.data.hasOwnProperty(key)) {
-                    var value = message.data[key].charCodeAt(0) > 255 ? LZString.decompressFromUTF16(message.data[key]) : message.data[key];
-
-                    html += '<tr>' +
-                                '<td class="key-column">' + key + '</td>' +
-                                '<td class="value-column">' +
-                                    value +
-                                '</td>' +
-                                '<td class="corner"></td>' +
-                            '</tr>';
-                }
-            }
-
-            document.querySelector('#tableBody').innerHTML = html;
-        }
-
-    });
-
-
-}());
-
-function syntaxHighlightJson(json) {
+/**
+ * Convert a json string into
+ * @param jsonStr
+ * @returns {string|XML}
+ */
+function syntaxHighlightJson(jsonStr) {
+    try {
+        var jsonObj = JSON.parse(jsonStr);
+        var json = JSON.stringify(jsonObj, null, 4);
+    } catch (e) {
+        // If the json parsing fails...
+        json = jsonStr;
+    }
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'number';
@@ -54,6 +29,22 @@ function syntaxHighlightJson(json) {
     });
 }
 
+function humanFileSize(size) {
+    if (size > 0) {
+        var i = Math.floor(Math.log(size) / Math.log(1024));
+        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['Bytes', 'kB', 'MB', 'GB', 'TB'][i];
+    } else {
+        return '0 Bytes';
+    }
+}
+
+/**
+ * On - Do event delegation for dynamic elements.
+ * @param elSelector
+ * @param eventName
+ * @param selector
+ * @param fn
+ */
 function on(elSelector, eventName, selector, fn) {
     var element = document.querySelector(elSelector);
 
@@ -77,15 +68,48 @@ function on(elSelector, eventName, selector, fn) {
 }
 
 
-function bglog(obj) {
-    if(chrome && chrome.runtime) {
-        chrome.runtime.sendMessage({action: "bglog", obj: obj});
-    }
-}
 
-document.getElementById('reload').addEventListener('click', function() {
-    chrome.extension.sendMessage({action: "reload", tabId: chrome.devtools.inspectedWindow.tabId});
-}, false);
+(function createChannel() {
+    //Create a port with background page for continous message communication
+    var port = chrome.extension.connect({
+        name: "Sample Communication" //Given a Name
+    });
+
+    // Listen to messages from the background page
+    port.onMessage.addListener(function (message) {
+
+        if (message.action == 'storage') {
+            var html = '';
+            var uncompressedSize = 0;
+            var compressedSize = 0;
+
+            for (var key in message.data) {
+                if (message.data.hasOwnProperty(key)) {
+                    var value = message.data[key].charCodeAt(0) > 255 ? LZString.decompressFromUTF16(message.data[key]) : message.data[key];
+                    compressedSize += message.data[key].length;
+                    uncompressedSize += value.length;
+                    html += '<tr>' +
+                                '<td class="key-column">' + key + '</td>' +
+                                '<td class="value-column" data-key="' + key + '">' +
+                                    value +
+                                '</td>' +
+                                '<td class="corner"></td>' +
+                            '</tr>';
+                }
+            }
+
+            document.querySelector('#tableBody').innerHTML = html;
+            document.querySelector('#sizeInfo').style.display = 'inline-block';
+            document.querySelector('#compressedSize').innerText = humanFileSize(compressedSize);
+            document.querySelector('#uncompressedSize').innerText = humanFileSize(uncompressedSize);
+        }
+
+    });
+
+
+}());
+
+
 
 on('#tableBody', 'click', 'tr', function(event) {
     var nodeList = document.querySelectorAll('tr.selected');
@@ -96,17 +120,23 @@ on('#tableBody', 'click', 'tr', function(event) {
 });
 
 on('#tableBody', 'dblclick', 'tr', function(event) {
-    bglog('dblclick, event.target: ' + event.target);
 
     var node = event.target.classList.contains('value-column') ? event.target : event.target.querySelector('.value-column');
-    var jsonStr = node.innerText;
-    bglog('json: ' + jsonStr);
-    var json = JSON.parse(jsonStr);
-    document.querySelector('#jsonDetails').innerHTML = syntaxHighlightJson(JSON.stringify(json, null, 4));
+    var jsonStr = node.innerText.trim();
+    var keyValue = node.attributes['data-key'].value;
+    document.querySelector('#modalKeyValue').innerText = 'Value for "' + keyValue + '"';
+    // If it looks like JSON, then...
+    if (jsonStr[0] == '{' || jsonStr[0] == '[') {
+        document.querySelector('#jsonDetails').innerHTML = syntaxHighlightJson(jsonStr);
+    }
 
     var style = document.querySelector('.modalDialog').style;
     style.opacity = 1;
     style.pointerEvents =  'auto';
+});
+
+document.getElementById('storageType').addEventListener('change', function(event) {
+    chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: event.target.value});
 });
 
 document.querySelector('#close').addEventListener('click', function() {
@@ -115,6 +145,5 @@ document.querySelector('#close').addEventListener('click', function() {
     style.pointerEvents =  'none';
 });
 
-bglog('background log complete');
+chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: 'local'});
 
-chrome.extension.sendMessage({action: "reload", tabId: chrome.devtools.inspectedWindow.tabId});

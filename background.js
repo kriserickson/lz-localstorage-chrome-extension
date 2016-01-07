@@ -10,12 +10,29 @@ chrome.extension.onConnect.addListener(function (port) {
 
     var extensionListener = function (message, sender, sendResponse) {
 
+        var _loadedTabId;
+
+        function getStorage(tabId, type) {
+            chrome.tabs.executeScript(tabId, {code: 'lzLocalStorageGetLocalStorage.getStorage("' + type + '");'})
+        }
+
         //port.postMessage('test');
         if (message.action) {
-
-            if (message.action == 'reload') {
-                chrome.tabs.executeScript(message.tabId, {file: 'getlocalstorage.js'});
-            } else if (message.action == 'localStorage') {
+            if (message.action == 'load' || (message.action == 'changeStorage' && !_loadedTabId)) {
+                chrome.tabs.executeScript(message.tabId, {code: 'window.lzLocalStorageGetLocalStorage'}, function (res) {
+                    console.log('res: ' + res[0]);
+                    if (!res[0]) {
+                        chrome.tabs.executeScript(message.tabId, {file: 'getstorage.js'}, function () {
+                            _loadedTabId = message.tabId;
+                            getStorage(message.tabId, message.storageType);
+                        });
+                    } else {
+                        getStorage(message.tabId, message.storageType);
+                    }
+                });
+            } else if (message.action == 'changeStorage'  && _loadedTabId) {
+                getStorage(message.tabId, message.storageType);
+            } else if (message.action == 'storage') {
                 port.postMessage(message);
             }
         }
@@ -26,18 +43,13 @@ chrome.extension.onConnect.addListener(function (port) {
 
     port.onDisconnect.addListener(function(port) {
         chrome.extension.onMessage.removeListener(extensionListener);
-        _port = undefined;
+        if (_loadedTabId) {
+            chrome.tabs.executeScript(_loadedTabId, {code: 'lzLocalStorageGetLocalStorage.stopStorage();'});
+        }
+        console.log('Disconnected');
     });
 
 
 
 });
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    switch(message.action) {
-        case "bglog":
-            console.log(message.obj);
-            break;
-    }
-    return true;
-});
