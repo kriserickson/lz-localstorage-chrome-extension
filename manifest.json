@@ -5,6 +5,7 @@
   "description": "LZipped Local Storage",
   "devtools_page": "devtools.html",
   "background": {
+    "persistent": false,
     "scripts": [
       "background.js"
     ]
