@@ -75,6 +75,8 @@ function on(elSelector, eventName, selector, fn) {
         name: "Sample Communication" //Given a Name
     });
 
+    chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: 'local'});
+
     // Listen to messages from the background page
     port.onMessage.addListener(function (message) {
 
@@ -154,6 +156,3 @@ document.querySelector('#close').addEventListener('click', function() {
     style.opacity = 0;
     style.pointerEvents =  'none';
 });
-
-chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: 'local'});
-
