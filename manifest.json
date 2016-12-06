@@ -1,6 +1,6 @@
 {
   "name": "LZipped Local Storage",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "manifest_version": 2,
   "description": "LZipped Local Storage",
   "devtools_page": "devtools.html",

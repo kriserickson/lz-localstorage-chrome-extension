@@ -20,8 +20,7 @@ chrome.extension.onConnect.addListener(function (port) {
         if (message.action) {
             if (message.action == 'load' || (message.action == 'changeStorage' && !_loadedTabId)) {
                 chrome.tabs.executeScript(message.tabId, {code: 'window.lzLocalStorageGetLocalStorage'}, function (res) {
-                    console.log('res: ' + res[0]);
-                    if (!res[0]) {
+                    if (!res || !res[0]) {
                         chrome.tabs.executeScript(message.tabId, {file: 'getstorage.js'}, function () {
                             _loadedTabId = message.tabId;
                             getStorage(message.tabId, message.storageType);
@@ -46,7 +45,6 @@ chrome.extension.onConnect.addListener(function (port) {
         if (_loadedTabId) {
             chrome.tabs.executeScript(_loadedTabId, {code: 'lzLocalStorageGetLocalStorage.stopStorage();'});
         }
-        console.log('Disconnected');
     });
 
 

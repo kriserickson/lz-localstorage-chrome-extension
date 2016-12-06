@@ -72,7 +72,7 @@ function on(elSelector, eventName, selector, fn) {
 (function createChannel() {
     //Create a port with background page for continous message communication
     var port = chrome.extension.connect({
-        name: "Sample Communication" //Given a Name
+        name: "LZ Storage Extenstion" //Given a Name
     });
 
     chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: 'local'});
