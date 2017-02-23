@@ -200,7 +200,16 @@
         <option value="local">Local Storage</option>
         <option value="session">Session Storage</option>
     </select>
+    <select id="compressionType">
+        <option value="utf-16">UTF-16 (safe)</option>
+        <option value="utf-16_unsafe">UTF-16 (unsafe)</option>
+        <option value="base64">Base64</option>
+        <option value="uriSafe">URL Encoded</option>
+        <!-- <option value="uint-8">UInt8 Array</option> -->
+    </select>
     <span>Compressed files shown in <span class="compressed">red</span>.</span>
+
+
     <div id="sizeInfo">
         Compressed Size: <span id="compressedSize"></span>
         Uncompressed Size: <span id="uncompressedSize"></span>

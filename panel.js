@@ -1,3 +1,7 @@
+// dirty globals here :(
+var compressionType = 'utf16';
+var lastData = {};
+
 /**
  * Convert a json string into
  * @param jsonStr
@@ -67,6 +71,69 @@ function on(elSelector, eventName, selector, fn) {
     });
 }
 
+function decodeString(string) {
+    var types = {
+        utf16: 'decompressFromUTF16',
+        utf16_unsafe: 'decompress',
+        base64: 'decompressFromBase64',
+        uriSafe: 'decompressFromEncodedURIComponent',
+        uint8: 'decompressFromUint8Array'
+    };
+
+    if(types[compressionType]) {
+        try {
+            var decoded = LZString[types[compressionType]](string);
+
+            if(decoded === null) {
+                // decoding failed
+                return string;
+            }
+
+            return decoded;
+
+        } catch(e) {
+            return string
+        }
+    }
+
+    return string;
+}
+
+function sanitize(str) {
+    return str.replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+function updateUI(data) {
+    var html = '';
+    var uncompressedSize = 0;
+    var compressedSize = 0;
+
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            var value = data[key];
+            var compressed = false;
+            if (value.charCodeAt(0) > 255 || /base64|uri/.test(compressionType)) {
+                value = decodeString(data[key]);
+                compressed = value !== data[key];
+            }
+
+            compressedSize += data[key].length;
+            uncompressedSize += value.length;
+            html += '<tr>' +
+                        '<td class="key-column">' + key + '</td>' +
+                        '<td class="value-column' + (compressed ? ' compressed' : '') + '" data-key="' + key + '">' +
+                            sanitize(value) +
+                        '</td>' +
+                        '<td class="corner"></td>' +
+                    '</tr>';
+        }
+    }
+
+    document.querySelector('#tableBody').innerHTML = html;
+    document.querySelector('#sizeInfo').style.display = 'inline-block';
+    document.querySelector('#compressedSize').innerText = humanFileSize(compressedSize * 2);    // Times 2 since we are using UFT-16 to store in localStorage
+    document.querySelector('#uncompressedSize').innerText = humanFileSize(uncompressedSize * 2);
+}
 
 
 (function createChannel() {
@@ -81,35 +148,8 @@ function on(elSelector, eventName, selector, fn) {
     port.onMessage.addListener(function (message) {
 
         if (message.action == 'storage') {
-            var html = '';
-            var uncompressedSize = 0;
-            var compressedSize = 0;
-
-            for (var key in message.data) {
-                if (message.data.hasOwnProperty(key)) {
-                    var value = message.data[key];
-                    var compressed = false;
-                    if (value.charCodeAt(0) > 255) {
-                        value = LZString.decompressFromUTF16(message.data[key]);
-                        compressed = true;
-                    }
-
-                    compressedSize += message.data[key].length;
-                    uncompressedSize += value.length;
-                    html += '<tr>' +
-                                '<td class="key-column">' + key + '</td>' +
-                                '<td class="value-column' + (compressed ? ' compressed' : '') + '" data-key="' + key + '">' +
-                                    value +
-                                '</td>' +
-                                '<td class="corner"></td>' +
-                            '</tr>';
-                }
-            }
-
-            document.querySelector('#tableBody').innerHTML = html;
-            document.querySelector('#sizeInfo').style.display = 'inline-block';
-            document.querySelector('#compressedSize').innerText = humanFileSize(compressedSize * 2);    // Times 2 since we are using UFT-16 to store in localStorage
-            document.querySelector('#uncompressedSize').innerText = humanFileSize(uncompressedSize * 2);
+            lastData = message.data;
+            updateUI(message.data);
         }
 
     });
@@ -149,6 +189,11 @@ on('#tableBody', 'dblclick', 'tr', function(event) {
 
 document.getElementById('storageType').addEventListener('change', function(event) {
     chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: event.target.value});
+});
+
+document.getElementById('compressionType').addEventListener('change', function(event) {
+    compressionType = event.target.value;
+    updateUI(lastData);
 });
 
 document.querySelector('#close').addEventListener('click', function() {
