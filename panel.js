@@ -36,7 +36,7 @@ function syntaxHighlightJson(jsonStr) {
 function humanFileSize(size) {
     if (size > 0) {
         var i = Math.floor(Math.log(size) / Math.log(1024));
-        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['Bytes', 'kB', 'MB', 'GB', 'TB'][i];
+        return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ['B', 'KB', 'MB', 'GB', 'TB'][i];
     } else {
         return '0 Bytes';
     }
@@ -119,8 +119,11 @@ function updateUI(data) {
 
             compressedSize += data[key].length;
             uncompressedSize += value.length;
+            var size = compressed ? '<span class="compressed">' + humanFileSize(data[key].length * 2) + '<span class="uncompressed"> (' + humanFileSize(value.length * 2) + ')</span></span>' :
+                    '<span class="uncompressed">' + humanFileSize(value.length * 2) + '</span>';
             html += '<tr>' +
                         '<td class="key-column">' + key + '</td>' +
+                        '<td class="size-column">' + size + '</span></td>' +
                         '<td class="value-column' + (compressed ? ' compressed' : '') + '" data-key="' + key + '">' +
                             sanitize(value) +
                         '</td>' +

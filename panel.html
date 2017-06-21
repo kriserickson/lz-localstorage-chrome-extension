@@ -55,6 +55,10 @@
             color: #c00;
         }
 
+        .uncompressed {
+            color: #000;
+        }
+
         .platform-mac .data-grid .corner,
         .data-grid.data-grid-fits-viewport .corner {
             display: none;
@@ -186,9 +190,22 @@
             background: #00d9ff;
         }
 
+
         #sizeInfo {
             display: none;
             float: right;
+        }
+
+        .key-column {
+            width: 15%;
+        }
+
+        .value-column {
+            width: 70%;
+        }
+
+        .size-column {
+            width: 1%;
         }
 
     </style>
@@ -220,6 +237,7 @@
         <thead>
             <tr>
                 <th class="key-column"><div>Key</div></th>
+                <th class="size-column"><div>Size</div></th>
                 <th class="value-column"><div>Value</div></th>
                 <th class="corner"></th>
             </tr>

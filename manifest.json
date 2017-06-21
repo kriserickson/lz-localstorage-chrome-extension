@@ -1,8 +1,13 @@
 {
-  "name": "LZipped Local Storage",
-  "version": "0.1.2",
   "manifest_version": 2,
+  "name": "LZipped Local Storage",
+  "version": "0.2.0",
   "description": "LZipped Local Storage",
+  "icons": {
+    "16": "lzip16.png",
+    "48": "lzip48.png",
+    "128": "lzip128.png"
+  },
   "devtools_page": "devtools.html",
   "background": {
     "persistent": false,
@@ -12,7 +17,13 @@
   },
   "permissions": [
     "tabs",
+    "background",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    "getstorage.js",
+    "background.js"
   ]
 }
