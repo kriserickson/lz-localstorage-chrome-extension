@@ -6,7 +6,10 @@
             padding:0;
             margin:0;
             zoom: 1;
-            background: #fff;
+        }
+
+        body.darkMode {
+            color:  rgb(213,213,214);
         }
 
         #localStorage {
@@ -59,6 +62,10 @@
             color: #000;
         }
 
+        body.darkMode .uncompressed {
+            color: rgb(213,213,214);
+        }
+
         .platform-mac .data-grid .corner,
         .data-grid.data-grid-fits-viewport .corner {
             display: none;
@@ -83,12 +90,21 @@
             background-color: rgb(234, 243, 255)
         }
 
+        body.darkMode .data-grid tr:nth-child(odd) {
+            background-color: #24292E;
+        }
+
 
         .data-grid td,
         .data-grid th {
             white-space: nowrap;
             line-height: 14px;
             border-left: 1px solid #aaa;
+        }
+
+        body.darkMode .data-grid td,
+        body.darkMode .data-grid th {
+            border-left-color: rgb(85, 85, 85);
         }
 
         .data-grid th {
@@ -116,6 +132,11 @@
             font-weight: normal;
             vertical-align: middle;
             padding: 0 4px;
+        }
+
+        body.darkMode .data-grid th {
+            background-color: rgb(42, 42, 42);
+            border-bottom-color: rgb(85, 85, 85);
         }
 
         .data-grid td > div {

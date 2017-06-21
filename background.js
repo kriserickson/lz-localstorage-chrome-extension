@@ -18,7 +18,7 @@ chrome.extension.onConnect.addListener(function (port) {
 
         //port.postMessage('test');
         if (message.action) {
-            var tabId = message.tabId || sender.tab.id;
+            var tabId = message.tabId;
             if (message.action == 'load' || (message.action == 'changeStorage' && !_loadedTabId)) {
                 chrome.tabs.executeScript(tabId, {code: 'window.lzLocalStorageGetLocalStorage'}, function (res) {
                     if (!res || !res[0]) {

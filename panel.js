@@ -145,6 +145,10 @@ function updateUI(data) {
         name: "LZ Storage Extenstion" //Given a Name
     });
 
+    if (chrome.devtools.panels.themeName === 'dark') {
+        document.querySelector('body').className += ' darkMode'
+    }
+
     chrome.extension.sendMessage({action: "load", tabId: chrome.devtools.inspectedWindow.tabId, storageType: 'local'});
 
     // Listen to messages from the background page
