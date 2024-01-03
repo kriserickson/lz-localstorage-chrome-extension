@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "LZipped Local Storage",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "LZipped Local Storage",
   "icons": {
     "16": "lzip16.png",
@@ -16,11 +16,9 @@
     ]
   },
   "permissions": [
-    "tabs",
     "background",
     "http://*/*",
-    "https://*/*",
-    "<all_urls>"
+    "https://*/*"
   ],
   "web_accessible_resources": [
     "getstorage.js",
