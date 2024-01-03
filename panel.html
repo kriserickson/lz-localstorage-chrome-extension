@@ -1,5 +1,6 @@
-<html>
+<html lang="en">
 <head>
+    <title>LZipped Storage Viewer</title>
     <script src="lz-string.js"></script>
     <style>
         body {
@@ -22,18 +23,30 @@
         }
 
         /* JSON Pretty Print */
-        pre {    outline: 1px solid #ccc;
+        pre.json {    outline: 1px solid #ccc;
             padding: 5px;
             margin: 5px;
             height: 85%;
             overflow: auto;
         }
 
-        .string { color: green; }
-        .number { color: darkorange; }
-        .boolean { color: blue; }
-        .null { color: magenta; }
-        .key { color: red; }
+        .json .string { color: green; }
+        .json .number { color: darkorange; }
+        .json .boolean { color: blue; }
+        .json .null { color: magenta; }
+        .json .key { color: red; }
+
+        .json .key-column {
+            width: 15%;
+        }
+
+        .json .value-column {
+            width: 70%;
+        }
+
+        .json .size-column {
+            width: 1%;
+        }
 
         /* Data Grid */
 
@@ -217,17 +230,6 @@
             float: right;
         }
 
-        .key-column {
-            width: 15%;
-        }
-
-        .value-column {
-            width: 70%;
-        }
-
-        .size-column {
-            width: 1%;
-        }
 
     </style>
 </head>
@@ -274,7 +276,7 @@
 
         <h2 id="modalKeyValue"></h2>
 
-        <pre id="jsonDetails"></pre>
+        <pre id="jsonDetails" class="json"></pre>
     </div>
 </div>
 
